@@ -12,10 +12,14 @@ The objective of the LLR2 algorithm is to cluster genes into groups that exhibit
 #### 1. Choice of similarity metric
 
 The similarity metric is computed as follows. We assume the expression of a single gene $A$ over time is given by the differential equation
+
 $$\frac{\text{d}m_A(t)}{\text{d}t} = p(t) - \kappa_A m_A(t),$$ 
+
 where $p(t)$ is a regulatory signal that may be common to multiple genes and $\kappa_A$ is a degradation rate. Assuming a second gene $B$ is similarly governed by $\frac{\text{d}m_B(t)}{\text{d}t} = p(t) - \kappa_B m_B(t)$, we can substitute this equation for gene $B$ into that of gene $A$ and integrate through to obtain the following model:
+
 $$m_A(t) = c_1 m_B(t) + c_2\int_0^t m_B(s)\text{d}s + c_3\int_0^t m_A(s)\text{d}s + c_4 t + c_5$$
-which is linear in the (unknown) constants $c_1,...,c_5$, the precise definitions of which can be found in Section 2.1 Eq. 4. 
+
+which is linear in the (unknown) constants $c_1,...,c_5$, the precise definitions of which can be found in equation 4 of Section 2.1 in our paper. 
 
 Thus, given temporal measurements $\{m_A(t_1),...,m_A(t_n)\}$ and $\{m_B(t_1),...,m_B(t_n)\}$ of genes $A$ and $B$, respectively, we can fit this model using linear regression - i.e., solve for the coefficients $c_1$ through $c_5$. 
 
@@ -136,6 +140,6 @@ plt.show()
 ```
 
 <p float = "left">
-  <img src = "Images/NetworkBayesLLR2.png" width = "400" />
-  <img src = "Images/NetworkOLSLLR2.png" width = "400" /> 
+  <img src = "Images/NetworkBayesLLR2.png" width = "450" />
+  <img src = "Images/NetworkOLSLLR2.png" width = "450" /> 
 </p>
