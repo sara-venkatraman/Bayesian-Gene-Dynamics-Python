@@ -20,6 +20,7 @@ hours = [0, 1, 2, 4, 5, 6, 8, 10, 12, 14, 16, 20, 24, 30, 36, 42, 48]
 # Reshape gene expression data into a list of lists
 geneDataList = geneData.values.tolist()
 
+
 # === Compute lead-lag R^2 matrices ===
 
 # These lines also print out the runtime, coming out to about 3.9 and 2.4 mins., respectively
@@ -29,6 +30,7 @@ LLR2OLS = LLR2(geneDataList, hours, bayes = False, writeToCSV = True)
 # OR: Read the matrices in from CSV if they have already been computed
 LLR2Bayes = np.loadtxt("LLR2_Matrices/BayesLLR2.csv", delimiter = ",")
 LLR2OLS = np.loadtxt("LLR2_Matrices/OLSLLR2.csv", delimiter = ",")
+
 
 # === Hierarchical clustering ===
 
@@ -60,6 +62,7 @@ for i, ax in enumerate(axes.flatten()):
 
 plt.tight_layout()
 fig.savefig("ClustersLLR2.png", format = "png", dpi = 300)
+
 
 # === Network statistics - Bayesian network ===
 
