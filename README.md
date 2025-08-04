@@ -140,6 +140,6 @@ plt.show()
 ```
 
 <p float = "left">
-  <img src = "Images/NetworkBayesLLR2.png" width = "450" />
-  <img src = "Images/NetworkOLSLLR2.png" width = "450" /> 
+  <img src = "Images/NetworkBayesLLR2.png" width = "400" />
+  <img src = "Images/NetworkOLSLLR2.png" width = "400" /> 
 </p>
