@@ -1,21 +1,20 @@
-## Dynamic models of co-regulated gene expression (Python)
+# Dynamic models of co-regulated gene expression (Python)
 
 This repository provides a Python implementation of the Bayesian lead-lag $R^2$ (LLR2) algorithm introduced in [Venkatraman et al. (2021)](https://www.tandfonline.com/doi/abs/10.1080/26941899.2023.2219707) for biologically-informed clustering and network analysis of time-course gene expression data. The R implementation is [here](https://github.com/sara-venkatraman/Bayesian-Gene-Dynamics).
 
 The algorithm makes use of the `NumPy` and `SciPy` packages, as well as `Matplotlib` and `NetworkX` for data visualization.
 
-### Explanation of clustering algorithm
+## Explanation of clustering algorithm
 
-The objective of the LLR2 algorithm is to cluster genes into groups that exhibit similar expression patterns over time. To do this, we measure the similarity between each pair of genes using the lead-lag $R^2$ metric (derived in full in Section 3 of our paper), which is computed using Bayesian regression.
+In genomic analysis, a common task is to identify groups of genes within an organism that exhibit similar expression (i.e., activity) patterns over time. Given time series measurements of gene expression levels, the objective of the LLR2 algorithm is to cluster genes based on their temporal expression dynamics. To achieve this, we quantify the similarity between each pair of genes using the lead-lag $R^2$ metric (briefly described below; fully derived in Section 3 of our paper), which is computed via Bayesian regression.
 
-
-#### 1. Choice of similarity metric
+### 1. Choice of similarity metric
 
 The similarity metric is computed as follows. We assume the expression of a single gene $A$ over time is given by the differential equation
 
 $$\frac{\text{d}m_A(t)}{\text{d}t} = p(t) - \kappa_A m_A(t),$$ 
 
-where $p(t)$ is a regulatory signal that may be common to multiple genes and $\kappa_A$ is a degradation rate. Assuming a second gene $B$ is similarly governed by $\frac{\text{d}m_B(t)}{\text{d}t} = p(t) - \kappa_B m_B(t)$, we can substitute this equation for gene $B$ into that of gene $A$ and integrate through to obtain the following model:
+where $p(t)$ is a regulatory signal that may be common to multiple genes and $\kappa_A$ is a degradation rate. Assuming a second gene $B$ is similarly governed by $\text{d}m_B(t)/\text{d}t = p(t) - \kappa_B m_B(t)$, we can substitute this equation for gene $B$ into that of gene $A$ above and integrate through to obtain the following model:
 
 $$m_A(t) = c_1 m_B(t) + c_2\int_0^t m_B(s)\text{d}s + c_3\int_0^t m_A(s)\text{d}s + c_4 t + c_5$$
 
@@ -26,19 +25,19 @@ Thus, given temporal measurements $\{m_A(t_1),...,m_A(t_n)\}$ and $\{m_B(t_1),..
 The $R^2$ from this model, which we refer to as the lead-lag $R^2$ (LLR2), is our measure of "similarity" between genes $A$ and $B$.
 
 
-#### 2. Use of Bayesian regression in similarity calculation
+### 2. Use of Bayesian regression in similarity calculation
 
 The auxiliary function `computeLLR2Bayes` in the file `llr2.py` uses Bayesian regression to compute the above-mentioned lead-lag $R^2$ between a pair of genes, given the time series data for both. Specifically, it uses external information from prior genomic studies or biological databases to place informative priors on the vector of coefficients $\boldsymbol{\beta} = [c_1,...,c_5]$; this helps to avoid obtaining spuriously high LLR2 values between genes. Regression settings are detailed in Section 3.1 to 3.4 of our paper.
 
 Our full algorithm, which computes the LLR2 between all pairs of genes and stores the values in a matrix, is implemented in the main function `LLR2` in the file `llr2.py`. As input, it takes a list of all $N$ genes' temporal expression profiles and a $N\times N$ prior "adjacency" matrix, each entry of which is 1, 0, or NA to indicate whether an association between the corresponding two genes exists (1), is unlikely (0), or is unknown (NA).
 
 
-#### 3. Clustering
+### 3. Clustering
 
 We can use the LLR2 matrix produced by the `LLR2` function as a similarity matrix in a hierarchical clustering method to divide the set of genes into groups that exhibit similar temporal dynamics and are likely to be biologically associated with one another. 
 
 
-### Usage
+## Usage
 
 Below is an abridged example of how to use this software, taken from the file `results.py`.
 
@@ -74,7 +73,7 @@ subGroups = fcluster(hierClust, t = 16, criterion = "maxclust")
 (clusterNumber, clusterCounts) = np.unique(subGroups, return_counts = True)
 ```
 
-We now plot the temporal expression patterns of the genes in the 16 clusters and can see that there are several groups with visually similar trajectories.
+Using the function `plotGenes` defined in `plotting.py`, we now plot the temporal expression patterns of the genes in the 16 clusters and can see that there are several groups with visually similar trajectories.
 
 ```
 # Define plot colors for each cluster
@@ -87,7 +86,7 @@ fig, axes = plt.subplots(4, 4, figsize = (12, 9))
 for i, ax in enumerate(axes.flatten()):
   # Extract gene time series data for current cluster i
   genesInCluster = np.where(subGroups == (i + 1))[0]
-  clusterData = [geneDataList[i] for i in genesInCluster]
+  clusterData = [geneData[i] for i in genesInCluster]
   
   # Set plot title
   plotTitle = "Cluster " + str(i + 1) + " (" + str(clusterCounts[i]) + " genes)"
@@ -123,7 +122,7 @@ The advantage of our Bayesian regression method is that it makes use of prior in
 
 ```
 # Run the LLR2 algorithm without Bayesian regression (i.e., using OLS regression)
-LLR2OLS = LLR2(geneDataList, hours, bayes = False, writeToCSV = True)
+LLR2OLS = LLR2(geneData, hours, bayes = False, writeToCSV = True)
 
 # Create adjacency matrix by thresholding R^2 values at 0.9
 adjacencyOLS = (LLR2OLS > 0.9) + 0
